@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import resumeData from "./resume.json" assert { type: "json" };
+import fs from "node:fs"
 
 
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
@@ -13,6 +13,12 @@ import { DynamicStructuredTool } from "langchain/tools";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+
+const resumePath = path.join(__dirname, "resume.json");
+
+const resumeRaw = fs.readFileSync(resumePath, "utf-8");
+const resumeData = JSON.parse(resumeRaw);
 
 
 dotenv.config();
