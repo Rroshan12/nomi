@@ -1,0 +1,101 @@
+{
+  "name": "Roshan Poudel",
+  "contact": {
+    "address": "Shankhamul",
+    "phone": "+9779749742245",
+    "email": "grappleroshan7@gmail.com",
+    "dateOfBirth": "1997-04-19",
+    "linkedin": "https://linkedin.com/in/roshan-poudel-a84145185",
+    "github": "https://github.com/Rroshan12",
+    "nuget": "https://nuget.org/packages/ListenItPro",
+    "portfolio": "https://roshanpoudel-pi.vercel.app/"
+  },
+  "objective": "Dedicated Senior Full Stack Software Engineer with over 5 years of experience in Node.js, .NET, JavaScript, and React. Proven expertise in scalable, high-performance applications, design patterns, monitoring, CI/CD, DevOps, and cloud. AWS Solutions Architect and RHCSA certified.",
+  "technicalSkills": {
+    "backend": ["Node.js", ".NET Core", "ASP.NET MVC", "C#", "REST API", "GraphQL", "gRPC"],
+    "frontend": ["React.js", "React Native", "JavaScript", "TypeScript", "Next.js", "Ant Design", "Material UI", "Chrome Extension Development"],
+    "databases": ["MS SQL Server", "PostgreSQL", "MongoDB"],
+    "cloudAndDevOps": ["Docker", "Azure", "AWS", "Nginx", "Jenkins", "Azure DevOps"],
+    "realTime": ["WebSockets", "GraphQL Subscriptions", "Microservices"],
+    "security": ["OAuth", "JWT", "Identity Server", "Role-Based Access Control"],
+    "ciCdMonitoring": ["Jenkins", "Azure DevOps", "Serilog", "Grafana", "Prometheus", "Hangfire"]
+  },
+  "workExperience": [
+    {
+      "role": "Software Engineer",
+      "company": "KrispCall Pvt Ltd",
+      "duration": "January 2024 – Present",
+      "stack": ["React.js", "Vite", "Ant Design", "GraphQL", "WebSockets", "Chrome Extensions", "OAuth"],
+      "description": [
+        "Upgraded React app to Vite.",
+        "Integrated calling features into 50+ CRM platforms via Chrome Extensions.",
+        "Real-time data with GraphQL Subscriptions and WebSockets.",
+        "Implemented OAuth for Microsoft Teams and Dynamics 365.",
+        "Used Apollo Cache and React Query.",
+        "Mentored frontend engineers."
+      ]
+    },
+    {
+      "role": "Software Engineer",
+      "company": "Info Developers Pvt Ltd",
+      "duration": "July 2023 – December 2023",
+      "stack": [".NET Core", "gRPC", "REST", "Hangfire", "SQL Server"],
+      "description": [
+        "Built scalable .NET Core backends.",
+        "Scheduled background jobs using Hangfire.",
+        "Integrated microservices via gRPC.",
+        "Designed load balancer and notification systems.",
+        "Automated data workflows using stored procedures."
+      ]
+    },
+    {
+      "role": "Software Engineer",
+      "company": "Umbrella Solutions Pvt Ltd",
+      "duration": "November 2020 – June 2023",
+      "stack": ["React", ".NET Core", "Node.js", "React Native", "PostgreSQL"],
+      "description": [
+        "Full-stack development across web and mobile.",
+        "Built HR, ERP loyalty, and ticketing systems.",
+        "Integrated biometric systems and payments.",
+        "Led mobile app dev for restaurants and parking.",
+        "Conducted code reviews and DevOps."
+      ]
+    }
+  ],
+  "education": {
+    "degree": "Bachelor of Computer Applications (BCA)",
+    "institution": "Indira Gandhi National Open University (IGNOU), India"
+  },
+  "certifications": [
+    "AWS Certified Solutions Architect – Associate",
+    "Red Hat Certified System Administrator (RHCSA)"
+  ],
+  "projects": [
+    {
+      "name": "ListenItPro",
+      "type": "NuGet Package",
+      "description": ".NET SQL Server listener for tracking and notifying table changes."
+    },
+    {
+      "name": "KrispCall",
+      "type": "VoIP",
+      "description": "Real-time scalable frontend/backend using React, WebSockets, Node.js, GraphQL."
+    },
+    {
+      "name": "Microsoft Teams App",
+      "description": "Collaborative productivity app developed and published using React."
+    },
+    {
+      "name": "ERP Loyalty System",
+      "description": "Rewards platform with analytics using full-stack tools."
+    },
+    {
+      "name": "CRM Chrome Extension",
+      "description": "Cross-platform browser extension to integrate call features."
+    },
+    {
+      "name": "IVR System",
+      "description": "Automated call routing system."
+    }
+  ]
+}
