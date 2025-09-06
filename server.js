@@ -32,36 +32,97 @@ const model = new ChatGoogleGenerativeAI({
 });
 
 
-const getResumeInfoTool = new DynamicStructuredTool({
+// Export the tool
+export const getResumeInfoTool = new DynamicStructuredTool({
   name: "getResumeInfo",
-  description: "Answers user questions about Roshan Poudel's resume, like work experience, contact info, email, skills, etc.",
+  description:
+    "Answers user questions about Roshan Poudel's resume, including contact info, skills, experience, education, certifications, and projects.",
   schema: z.object({
-    question: z.string().describe("User's question about the resume")
+    question: z.string().describe("User's question about Roshan's resume")
   }),
+
   func: async ({ question }) => {
     const lower = question.toLowerCase();
 
-    if (lower.includes("email")) {
-      return `Roshan's email is ${resumeData.contact.email}`;
+    // 🔹 Roshan keyword summary
+    if (
+      lower.includes("roshan") &&
+      (lower.includes("who") ||
+        lower.includes("about") ||
+        lower.includes("profile") ||
+        lower.includes("what") ||
+        lower.includes("is"))
+    ) {
+      return `Roshan Poudel is a Senior Full Stack Software Engineer with over 5 years of experience specializing in Node.js, .NET, JavaScript, and React.\n\n${resumeData.objective}`;
     }
 
-    if (lower.includes("experience") || lower.includes("worked")) {
-      return resumeData.workExperience.map((job) => {
-        return `${job.role} at ${job.company} (${job.duration})`;
-      }).join("\n");
+    // 🔹 Contact Info
+    if (lower.includes("email")) return `Roshan's email is ${resumeData.contact.email}`;
+    if (lower.includes("phone")) return `Roshan's phone number is ${resumeData.contact.phone}`;
+    if (lower.includes("linkedin")) return `Roshan's LinkedIn: ${resumeData.contact.linkedin}`;
+    if (lower.includes("github")) return `Roshan's GitHub: ${resumeData.contact.github}`;
+    if (lower.includes("portfolio")) return `Roshan's portfolio: ${resumeData.contact.portfolio}`;
+    if (lower.includes("address")) return `Roshan lives in ${resumeData.contact.address}`;
+    if (lower.includes("birth") || lower.includes("dob")) return `Roshan was born on ${resumeData.contact.dateOfBirth}`;
+
+    // 🔹 Education
+    if (lower.includes("education") || lower.includes("study")) {
+      return `Roshan completed his ${resumeData.education.degree} from ${resumeData.education.institution}`;
     }
 
-    if (lower.includes("phone")) {
-      return `Roshan's phone number is ${resumeData.contact.phone}`;
+    // 🔹 Certifications
+    if (lower.includes("certification") || lower.includes("certified")) {
+      return `Roshan has the following certifications:\n- ${resumeData.certifications.join("\n- ")}`;
     }
 
-    if (lower.includes("projects")) {
-      return resumeData.projects.map((p) => `- ${p.name}: ${p.description}`).join("\n");
+    // 🔹 Objective
+    if (lower.includes("objective") || lower.includes("goal")) {
+      return resumeData.objective;
     }
 
-    return "Sorry, I couldn't find an exact match for your question. Try asking about email, experience, phone, or projects.";
+    // 🔹 Skills
+    if (
+      lower.includes("skills") ||
+      lower.includes("technologies") ||
+      lower.includes("tech") ||
+      lower.includes("stack")
+    ) {
+      const skills = resumeData.technicalSkills;
+      return `
+Backend: ${skills.backend.join(", ")}
+Frontend: ${skills.frontend.join(", ")}
+Databases: ${skills.databases.join(", ")}
+Cloud & DevOps: ${skills.cloudAndDevOps.join(", ")}
+Real-Time & Microservices: ${skills.realTime.join(", ")}
+Security: ${skills.security.join(", ")}
+CI/CD & Monitoring: ${skills.ciCdMonitoring.join(", ")}
+      `.trim();
+    }
+
+    // 🔹 Experience
+    if (
+      lower.includes("experience") ||
+      lower.includes("worked") ||
+      lower.includes("job") ||
+      lower.includes("career") ||
+      lower.includes("history")
+    ) {
+      return resumeData.workExperience
+        .map((job) => `${job.role} at ${job.company} (${job.duration})`)
+        .join("\n");
+    }
+
+    // 🔹 Projects
+    if (lower.includes("project")) {
+      return resumeData.projects
+        .map((p) => `- ${p.name}: ${p.description}`)
+        .join("\n");
+    }
+
+    // 🔹 Fallback
+    return "Sorry, I couldn't find an exact match for your question. Try asking about email, experience, phone, skills, projects, or certifications.";
   }
-});
+})
 const prompt = ChatPromptTemplate.fromMessages([
   ["system", "You are a helpful assistant that uses tools when needed."],
   ["human", "{input}"],
