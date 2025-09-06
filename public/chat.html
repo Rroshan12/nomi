@@ -63,12 +63,40 @@
     .chat-input input {
       flex: 1;
     }
+
+    /* Typing dots animation */
+    .typing-indicator {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background-color: #6c757d;
+      border-radius: 50%;
+      animation: blink 1.4s infinite both;
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes blink {
+      0% { opacity: 0.2; }
+      20% { opacity: 1; }
+      100% { opacity: 0.2; }
+    }
   </style>
 </head>
 <body>
   <div class="chat-container d-flex flex-column shadow">
-    <div class="chat-messages" id="chatMessages">
-    </div>
+    <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input">
       <form id="chatForm">
         <input
@@ -83,60 +111,84 @@
     </div>
   </div>
 
- 
   <script>
-  const chatForm = document.getElementById("chatForm");
-  const chatInput = document.getElementById("chatInput");
-  const chatMessages = document.getElementById("chatMessages");
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const chatMessages = document.getElementById("chatMessages");
 
-  chatForm.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    const message = chatInput.value.trim();
-    if (message === "") return;
+    let typingIndicatorEl = null;
 
-    addMessage("user", message);
-    chatInput.value = "";
+    chatForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const message = chatInput.value.trim();
+      if (message === "") return;
 
-    await sendMessageToBot(message);
-  });
+      addMessage("user", message);
+      chatInput.value = "";
 
-  function addMessage(sender, text) {
-    const messageEl = document.createElement("div");
-    messageEl.classList.add("chat-message", sender);
+      showTypingIndicator();
+      await sendMessageToBot(message);
+    });
 
-    const messageContent = document.createElement("div");
-    messageContent.classList.add("message");
-    messageContent.textContent = text;
+    function addMessage(sender, text) {
+      if (typingIndicatorEl) {
+        typingIndicatorEl.remove();
+        typingIndicatorEl = null;
+      }
 
-    messageEl.appendChild(messageContent);
-    chatMessages.appendChild(messageEl);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
+      const messageEl = document.createElement("div");
+      messageEl.classList.add("chat-message", sender);
 
-  async function sendMessageToBot(message) {
-    try {
-      const res = await fetch("/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message }),
-      });
+      const messageContent = document.createElement("div");
+      messageContent.classList.add("message");
+      messageContent.textContent = text;
 
-      const data = await res.json();
-      addMessage("bot", data.response);
-    } catch (error) {
-      addMessage("bot", "Error: could not reach server");
-      console.error(error);
+      messageEl.appendChild(messageContent);
+      chatMessages.appendChild(messageEl);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-  }
 
-  window.addEventListener("DOMContentLoaded", () => {
-    const defaultMessage = "Tell me about Roshan";
-    addMessage("user", defaultMessage);
-    sendMessageToBot(defaultMessage);
-  });
-</script>
+    function showTypingIndicator() {
+      typingIndicatorEl = document.createElement("div");
+      typingIndicatorEl.classList.add("chat-message", "bot");
 
+      const dots = document.createElement("div");
+      dots.classList.add("message", "typing-indicator");
+      dots.innerHTML = `
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      `;
+
+      typingIndicatorEl.appendChild(dots);
+      chatMessages.appendChild(typingIndicatorEl);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function sendMessageToBot(message) {
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message }),
+        });
+
+        const data = await res.json();
+        addMessage("bot", data.response);
+      } catch (error) {
+        addMessage("bot", "Error: could not reach server");
+        console.error(error);
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const defaultMessage = "Tell me about Roshan";
+      addMessage("user", defaultMessage);
+      showTypingIndicator();
+      sendMessageToBot(defaultMessage);
+    });
+  </script>
 </body>
 </html>

@@ -140,6 +140,7 @@ const agent = await createToolCallingAgent({
 const executor = await AgentExecutor.fromAgentAndTools({
   agent,
   tools: [getResumeInfoTool],
+  maxIterations: 5, 
 });
 
 
