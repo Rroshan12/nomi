@@ -32,7 +32,7 @@ const model = new ChatGoogleGenerativeAI({
 });
 
 
-// Export the tool
+
 export const getResumeInfoTool = new DynamicStructuredTool({
   name: "getResumeInfo",
   description:
@@ -44,7 +44,6 @@ export const getResumeInfoTool = new DynamicStructuredTool({
   func: async ({ question }) => {
     const lower = question.toLowerCase();
 
-    // 🔹 Roshan keyword summary
     if (
       lower.includes("roshan") &&
       (lower.includes("who") ||
@@ -56,7 +55,6 @@ export const getResumeInfoTool = new DynamicStructuredTool({
       return `Roshan Poudel is a Senior Full Stack Software Engineer with over 5 years of experience specializing in Node.js, .NET, JavaScript, and React.\n\n${resumeData.objective}`;
     }
 
-    // 🔹 Contact Info
     if (lower.includes("email")) return `Roshan's email is ${resumeData.contact.email}`;
     if (lower.includes("phone")) return `Roshan's phone number is ${resumeData.contact.phone}`;
     if (lower.includes("linkedin")) return `Roshan's LinkedIn: ${resumeData.contact.linkedin}`;
@@ -65,22 +63,19 @@ export const getResumeInfoTool = new DynamicStructuredTool({
     if (lower.includes("address")) return `Roshan lives in ${resumeData.contact.address}`;
     if (lower.includes("birth") || lower.includes("dob")) return `Roshan was born on ${resumeData.contact.dateOfBirth}`;
 
-    // 🔹 Education
     if (lower.includes("education") || lower.includes("study")) {
       return `Roshan completed his ${resumeData.education.degree} from ${resumeData.education.institution}`;
     }
 
-    // 🔹 Certifications
+
     if (lower.includes("certification") || lower.includes("certified")) {
       return `Roshan has the following certifications:\n- ${resumeData.certifications.join("\n- ")}`;
     }
 
-    // 🔹 Objective
     if (lower.includes("objective") || lower.includes("goal")) {
       return resumeData.objective;
     }
 
-    // 🔹 Skills
     if (
       lower.includes("skills") ||
       lower.includes("technologies") ||
@@ -99,7 +94,6 @@ CI/CD & Monitoring: ${skills.ciCdMonitoring.join(", ")}
       `.trim();
     }
 
-    // 🔹 Experience
     if (
       lower.includes("experience") ||
       lower.includes("worked") ||
@@ -112,14 +106,12 @@ CI/CD & Monitoring: ${skills.ciCdMonitoring.join(", ")}
         .join("\n");
     }
 
-    // 🔹 Projects
     if (lower.includes("project")) {
       return resumeData.projects
         .map((p) => `- ${p.name}: ${p.description}`)
         .join("\n");
     }
 
-    // 🔹 Fallback
     return "Sorry, I couldn't find an exact match for your question. Try asking about email, experience, phone, skills, projects, or certifications.";
   }
 })
@@ -141,6 +133,9 @@ const executor = await AgentExecutor.fromAgentAndTools({
   agent,
   tools: [getResumeInfoTool],
   maxIterations: 5, 
+  verbose:true,
+  returnIntermediateSteps:true
+
 });
 
 
@@ -163,8 +158,21 @@ app.post("/chat", async (req, res) => {
 
   try {
     const result = await executor.invoke({ input });
+    const data = response.intermediateSteps[0].observation;
+    if(data !=null)
+    {
+          res.json({ response: data });
+    }
     res.json({ response: result.output });
   } catch (error) {
+     if (error.status === 429) {
+      // fallback: answer directly using resume tool
+      const fallback = await getResumeInfoTool.func({ question: input });
+      return res.json({
+        response: `[⚠️ Gemini quota exceeded, using fallback] \n\n\n${fallback}`,
+      });
+    }
+
     console.error("Agent Error:", error);
     res.status(500).json({ error: "Something went wrong." });
   }
