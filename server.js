@@ -13,7 +13,7 @@ import { DynamicStructuredTool } from "langchain/tools";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+let geminiDown = false;
 
 const resumePath = path.join(__dirname, "resume.json");
 
@@ -132,7 +132,7 @@ const agent = await createToolCallingAgent({
 const executor = await AgentExecutor.fromAgentAndTools({
   agent,
   tools: [getResumeInfoTool],
-  maxIterations: 5, 
+  maxIterations: 1, 
   verbose:true,
   returnIntermediateSteps:true
 
@@ -149,7 +149,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "chat.html"));
 });
 
-
 app.post("/chat", async (req, res) => {
   const input = req.body?.message;
   if (!input) {
@@ -157,19 +156,28 @@ app.post("/chat", async (req, res) => {
   }
 
   try {
-    const result = await executor.invoke({ input });
-    const data = response.intermediateSteps[0].observation;
-    if(data !=null)
-    {
-          res.json({ response: data });
-    }
-    res.json({ response: result.output });
-  } catch (error) {
-     if (error.status === 429) {
-      // fallback: answer directly using resume tool
+    if (geminiDown) {
       const fallback = await getResumeInfoTool.func({ question: input });
       return res.json({
-        response: `[⚠️ Gemini quota exceeded, using fallback] \n\n\n${fallback}`,
+        response: `[Gemini quota exhausted, using fallback]\n\n${fallback}`,
+      });
+    }
+
+
+    const result = await executor.invoke({ input });
+
+    if (result.intermediateSteps?.[0]?.observation) {
+      return res.json({ response: result.intermediateSteps[0].observation });
+    }
+
+    return res.json({ response: result.output });
+  } catch (error) {
+    if (error.status === 429) {
+      console.warn("Gemini quota exhausted, switching to fallback mode");
+      geminiDown = true;
+      const fallback = await getResumeInfoTool.func({ question: input });
+      return res.json({
+        response: `[Gemini quota exceeded, using fallback]\n\n${fallback}`,
       });
     }
 
